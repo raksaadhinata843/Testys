@@ -1,0 +1,13 @@
+name: Validate Crypto Data
+on: [push, pull_request]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run YAML Schema Validator
+        uses: nrkno/yaml-schema-validator-github-action@v5
+        with:
+          schema: schema.yml
+          target: data/*.yml # Asumsi file data Anda ada di folder 'data'
