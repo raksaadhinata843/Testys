@@ -9,5 +9,5 @@ jobs:
       - name: Run YAML Schema Validator
         uses: nrkno/yaml-schema-validator-github-action@v5
         with:
-          schema: schema.yml
+          schema: schemator.yml
           target: data/*.yml # Asumsi file data Anda ada di folder 'data'
