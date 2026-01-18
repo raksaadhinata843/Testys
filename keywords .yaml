@@ -1,0 +1,10 @@
+queries:
+  - "laptop 16gb ram"
+  - "laptop ram 16gb fhd"
+  - "laptop 16gb full hd"
+
+negative_keywords:
+  - chromebook
+  - tablet
+  - touchscreen
+  - 2-in-1
