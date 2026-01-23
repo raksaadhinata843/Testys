@@ -4,8 +4,11 @@ import sys
 from datetime import datetime
 from apscheduler.schedulers.blocking import BlockingScheduler
 from .scraper import fetch_coins, SimpleRateLimiter
-from .database import save_coins
 from .logger import get_logger
+
+# storage imports are local to avoid import if not used
+from .database import save_coins as save_to_file, DEFAULT_FILE
+from .database_sqlite import save_coins as save_to_sqlite, DEFAULT_DB
 
 logger = get_logger(__name__)
 
@@ -14,8 +17,17 @@ SCHEDULE_MINUTES = int(os.getenv("SCHEDULE_MINUTES", "60"))   # default every 60
 RATE_LIMIT_INTERVAL_SECONDS = float(os.getenv("RATE_LIMIT_INTERVAL_SECONDS", "1.0"))
 PER_PAGE = int(os.getenv("PER_PAGE", "50"))
 PAGE = int(os.getenv("PAGE", "1"))
+STORAGE = os.getenv("STORAGE", "file").lower()  # "file" or "sqlite"
 
 _rate_limiter = SimpleRateLimiter(min_interval=RATE_LIMIT_INTERVAL_SECONDS)
+
+def _save(coins):
+    if STORAGE == "sqlite":
+        logger.info("Saving to SQLite DB: %s", DEFAULT_DB)
+        save_to_sqlite(coins, path=DEFAULT_DB)
+    else:
+        logger.info("Saving to local JSON file: %s", DEFAULT_FILE)
+        save_to_file(coins, path=DEFAULT_FILE)
 
 def job():
     logger.info("Starting scheduled job at %s", datetime.utcnow().isoformat())
@@ -23,8 +35,8 @@ def job():
         coins = fetch_coins(per_page=PER_PAGE, page=PAGE, rate_limiter=_rate_limiter)
         logger.info("Job fetched %d coins", len(coins))
         if coins:
-            save_coins(coins)
-            logger.info("Saved %d coins to disk", len(coins))
+            _save(coins)
+            logger.info("Saved %d coins", len(coins))
     except Exception as e:
         logger.exception("Job failed: %s", e)
 
