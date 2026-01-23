@@ -1,49 +1,56 @@
-import logging
+import os
+import signal
+import sys
+from datetime import datetime
+from apscheduler.schedulers.blocking import BlockingScheduler
+from .scraper import fetch_coins, SimpleRateLimiter
+from .database import save_coins
+from .logger import get_logger
 
-from scraper import fetch_coins
-from models import Coin
-from database import save_coins
+logger = get_logger(__name__)
 
+# Config via environment variables for flexibility
+SCHEDULE_MINUTES = int(os.getenv("SCHEDULE_MINUTES", "60"))   # default every 60 minutes
+RATE_LIMIT_INTERVAL_SECONDS = float(os.getenv("RATE_LIMIT_INTERVAL_SECONDS", "1.0"))
+PER_PAGE = int(os.getenv("PER_PAGE", "50"))
+PAGE = int(os.getenv("PAGE", "1"))
 
-def setup_logging():
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
-    )
+_rate_limiter = SimpleRateLimiter(min_interval=RATE_LIMIT_INTERVAL_SECONDS)
 
-
-def main():
-    setup_logging()
-    logger = logging.getLogger(__name__)
-
-    logger.info("Starting weather scraper pipeline")
-
+def job():
+    logger.info("Starting scheduled job at %s", datetime.utcnow().isoformat())
     try:
-        init_db()
-        logger.info("Database initialized")
-
-        raw_data = run_scraper()
-        logger.info(f"Fetched {len(raw_data)} records")
-
-        validated = []
-        for item in raw_data:
-            try:
-                validated.append(Coin(**item))
-            except Exception as e:
-                logger.warning(f"Validation failed for item: {e}")
-
-        if not validated:
-            logger.error("No valid data to save. Aborting.")
-            return
-
-        upsert_coins(validated)
-        logger.info(f"Saved {len(validated)} records to database")
-
+        coins = fetch_coins(per_page=PER_PAGE, page=PAGE, rate_limiter=_rate_limiter)
+        logger.info("Job fetched %d coins", len(coins))
+        if coins:
+            save_coins(coins)
+            logger.info("Saved %d coins to disk", len(coins))
     except Exception as e:
-        logger.exception("Fatal error in main pipeline")
-        raise  # biar CI/CD tetap fail
+        logger.exception("Job failed: %s", e)
 
+def run_once():
+    logger.info("Running scraper once (no scheduler)")
+    job()
+
+def run_scheduler():
+    scheduler = BlockingScheduler()
+    # Schedule job every SCHEDULE_MINUTES
+    scheduler.add_job(job, 'interval', minutes=SCHEDULE_MINUTES, id="coin_scrape_job", max_instances=1)
+    logger.info("Starting scheduler: interval=%s minutes", SCHEDULE_MINUTES)
+
+    def _shutdown(signum, frame):
+        logger.info("Received shutdown signal, stopping scheduler...")
+        scheduler.shutdown(wait=False)
+        sys.exit(0)
+
+    signal.signal(signal.SIGINT, _shutdown)
+    signal.signal(signal.SIGTERM, _shutdown)
+
+    scheduler.start()
 
 if __name__ == "__main__":
-
-    main()
+    mode = os.getenv("MODE", "daemon")  # "daemon" or "once"
+    if mode == "once":
+        run_once()
+    else:
+        run_scheduler()
