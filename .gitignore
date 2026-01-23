@@ -1,5 +1,25 @@
+# Python
 __pycache__/
-*.pyc
-.env
-.ipynb_checkpoints/
-data/pipeline.log
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtualenv
+.venv/
+env/
+venv/
+
+# Editor
+.vscode/
+.idea/
+
+# Data
+data/*.json
+data/*.db
+
+# pytest cache
+.pytest_cache/
