@@ -1,8 +1,8 @@
 import logging
 
-from scraper import run_scraper
+from scraper import fetch_coins
 from models import Coin
-from database import init_db, upsert_coins
+from database import save_coins
 
 
 def setup_logging():
@@ -45,4 +45,5 @@ def main():
 
 
 if __name__ == "__main__":
+
     main()
