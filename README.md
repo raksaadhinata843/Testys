@@ -278,7 +278,7 @@ A: Ya, tambahkan handler logging atau callback di `src/main.py` untuk send alert
 
 ## License
 
-MIT (atau sesuai preferensi kamu)
+MIT
 
 ## Kontribusi
 
