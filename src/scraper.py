@@ -3,8 +3,8 @@ import time
 import threading
 from typing import List, Optional
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
-from .models import Coin
-from .logger import get_logger
+from src.models import Coin
+from src.logger import get_logger
 import os
 
 logger = get_logger(__name__)
