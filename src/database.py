@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 from typing import List
-from .models import Coin
+from src.models import Coin
 
 DATA_DIR = Path("data")
 DATA_DIR.mkdir(parents=True, exist_ok=True)
