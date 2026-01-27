@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 from dateutil import parser as date_parser
 
 class Coin(BaseModel):
@@ -23,9 +23,10 @@ class Coin(BaseModel):
     atl: Optional[float]
     last_updated: datetime
 
-    @field_validator("last_updated", pre=True)
+    @field_validator("last_updated", mode="before")
     def parse_last_updated(cls, v):
         if not v:
+            return datetime.now   
             raise ValueError("last_updated is required")
         if isinstance(v, datetime):
             return v
