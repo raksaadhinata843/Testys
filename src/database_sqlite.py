@@ -2,7 +2,7 @@ from pathlib import Path
 import sqlite3
 import json
 from typing import List, Optional
-from .models import Coin
+from src.models import Coin
 
 DB_DIR = Path("data")
 DB_DIR.mkdir(parents=True, exist_ok=True)
