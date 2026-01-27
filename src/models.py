@@ -23,7 +23,7 @@ class Coin(BaseModel):
     atl: Optional[float]
     last_updated: datetime
 
-    @validator("last_updated", pre=True)
+    @field_validator("last_updated", pre=True)
     def parse_last_updated(cls, v):
         if not v:
             raise ValueError("last_updated is required")
