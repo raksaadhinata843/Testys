@@ -3,8 +3,8 @@ import signal
 import sys
 from datetime import datetime
 from apscheduler.schedulers.blocking import BlockingScheduler
-from .scraper import fetch_coins, SimpleRateLimiter
-from .logger import get_logger
+from src.scraper import fetch_coins, SimpleRateLimiter
+from src.logger import get_logger
 
 # storage imports are local to avoid import if not used
 from .database import save_coins as save_to_file, DEFAULT_FILE
@@ -66,3 +66,4 @@ if __name__ == "__main__":
         run_once()
     else:
         run_scheduler()
+
