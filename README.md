@@ -229,9 +229,9 @@ black src/ tests/
 isort src/ tests/
 ```
 
-## Production Deployment
+## Scaling Consideration
 
-Untuk deployment production:
+Untuk scaling consideration:
 
 1. **Gunakan SQLite atau dedicated database** (`src/database_sqlite.py` atau upgrade ke Postgres)
 2. **Simpan logs di persistent storage** atau centralized logging (ELK, Datadog, etc)
