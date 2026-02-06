@@ -1,1 +1,9 @@
+name: base
+channels:
+  - defaults
+dependencies:
+  - python=3.9
+  - pip
+  - pip:
+    - # tambahkan library lain di sini
 
