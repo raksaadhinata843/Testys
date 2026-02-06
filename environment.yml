@@ -5,5 +5,11 @@ dependencies:
   - python=3.9
   - pip
   - pip:
-    - # tambahkan library lain di sini
+    - requests>=2.31.0
+    - pydantic>=2.5.3
+    - tenacity>=8.2.3
+    - python-dateutil>=2.8.2
+    - pytest>=7.0.0
+    - apscheduler>=3.10.4
+    - python-dotenv==1.0.0# tambahkan library lain di sini
 
