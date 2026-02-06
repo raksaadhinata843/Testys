@@ -1,0 +1,11 @@
+name: Test Script
+on: workflow_dispatch # Ini tombol pemicu manualnya!
+
+jobs:
+  run-python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Jalankan Script
+        run: python database.py
+
